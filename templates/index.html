@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗句生成器</title>
+    <style>
+        body {
+            font-family: 'SimSun', '宋体', serif; /* 使用宋体 */
+            font-weight: bold; /* 字体加粗 */
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-image: url('/static/bg3.png'); /* 替换为实际背景图片路径 */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #000; /* 所有文本颜色改为黑色 */
+        }
+
+        h1, h2, p {
+            font-weight: bold; /* 确保标题和段落也加粗 */
+            color: #000; /* 确保所有文本颜色为黑色 */
+        }
+
+        form {
+            margin: 20px auto;
+        }
+
+        input[type="file"] {
+            margin: 10px;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #content-container {
+            max-width: 1000px; /* 最大宽度 */
+            margin: 20px auto; /* 居中显示 */
+            overflow: hidden; /* 清除浮动 */
+        }
+
+        #uploaded-image {
+            max-width: 45%; /* 限制最大宽度为父容器的 45% */
+            border: 2px solid #000; /* 添加边框 */
+            border-radius: 10px; /* 圆角边框 */
+            float: left; /* 浮动到左侧 */
+            margin-right: 20px; /* 右侧外边距 */
+        }
+
+        #poem-container {
+            border: 2px solid #000; /* 黑色边框 */
+            border-radius: 10px; /* 圆角边框 */
+            padding: 20px; /* 内边距 */
+            margin: 20px 20px 20px 0; /* 上右下左外边距 */
+            width: 350px; /* 固定宽度 */
+            height: 150px; /* 固定高度 */
+            background-color: #f9f9f9; /* 背景色 */
+            color: #000; /* 文字颜色 */
+            text-align: left; /* 左对齐 */
+            font-size: 1.5em; /* 字体大小 */
+            box-sizing: border-box; /* 边框和内边距包含在宽度和高度内 */
+            overflow: auto; /* 如果内容超出固定大小，则显示滚动条 */
+            float: left; /* 浮动到左侧 */
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+    </style>
+</head>
+<body>
+    <h1>映诗：基于视觉编码与自然语言生成的平台</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <br>
+        <button type="submit">上传图片</button>
+    </form>
+
+    <div id="content-container">
+        <img id="uploaded-image" src="" alt="Uploaded Image">
+        <div id="poem-container">
+            <p id="poem-output"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // 显示上传的图片
+                    const imageUrl = URL.createObjectURL(formData.get('file'));
+                    const imageElement = document.getElementById('uploaded-image');
+                    imageElement.src = imageUrl;
+                    imageElement.style.display = 'block';
+
+                    // 显示生成的诗句
+                    document.getElementById('poem-output').innerText = data.poem;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
